@@ -25,9 +25,9 @@ module Apartment
     def run(direction, database, version)
       Tenant.switch(database) do
         if ActiveRecord.version >= Gem::Version.new('7.2.0')
-          ActiveRecord::Base.connection_pool.migration_context.run(direction, version)
+          ActiveRecord::Base.connection_pool.migration_context.migrate(version, &migration_scope_block)
         else
-          ActiveRecord::Base.connection.migration_context.run(direction, version)
+          ActiveRecord::Base.connection.migration_context.migrate(version, &migration_scope_block)
         end
       end
     end
@@ -36,9 +36,9 @@ module Apartment
     def rollback(database, step = 1)
       Tenant.switch(database) do
         if ActiveRecord.version >= Gem::Version.new('7.2.0')
-          ActiveRecord::Base.connection_pool.migration_context.rollback(step)
+          ActiveRecord::Base.connection_pool.migration_context.migrate(version, &migration_scope_block)
         else
-          ActiveRecord::Base.connection.migration_context.rollback(step)
+          ActiveRecord::Base.connection.migration_context.migrate(version, &migration_scope_block)
         end
       end
     end
